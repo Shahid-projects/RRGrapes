@@ -17,7 +17,6 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
       "package": "com.shahid22.GrapesApp"
     },
     "web": {
@@ -33,34 +32,21 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#ffffff"
         }
       ],
       "expo-video",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "usesCleartextTraffic": true
-          }
-        }
-      ]
+      "expo-build-properties"
     ],
     "experiments": {
       "supportsBackgroundPlayback": true,
-      "supportsPictureInPicture": true,
-      "typedRoutes": true,
-      "reactCompiler": true
+      "supportsPictureInPicture": true
     },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "649bb334-1122-47ca-a792-5a34286f9d17"
       }
-    },
-    "owner": "shahid22"
+    }
   }
 }
