@@ -1,9 +1,12 @@
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View, Alert } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View, Alert, useWindowDimensions } from 'react-native';
 import { API_BASE_URL } from '../constants/api';
+// 🔥 Import the HTML renderer
+import RenderHtml from 'react-native-render-html'; 
 
 export default function AboutScreen() {
+    const { width } = useWindowDimensions(); // Hook needed for RenderHtml
     const [aboutUsData, setAboutUsData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -11,17 +14,19 @@ export default function AboutScreen() {
     useEffect(() => {
         const fetchAboutUsData = async () => {
             try {
-                // --- FIX: Corrected API path spelling from 'aboutuus' to 'aboutus' to resolve the 400 error ---
-                const response = await axios.get(`${API_BASE_URL}/api/v1/auth/aboutus`);
-                if (response.data) {
-                    setAboutUsData(response.data);
+                // Using the unauthenticated endpoint: /aboutuus
+                const API_PATH = '/api/v1/auth/aboutuus'; 
+                const response = await axios.get(`${API_BASE_URL}${API_PATH}`);
+                
+                if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+                    setAboutUsData(response.data[0]); 
                 } else {
-                    setError('No information has been provided yet.');
+                    setError('No public "About Us" information has been provided yet.');
                 }
             } catch (err) {
                 console.error("Failed to fetch About Us data:", err);
-                // We keep the original error message for consistency
-                setError('We couldn\'t load our story right now. Please check your connection and try again.');
+                let errorMessage = 'We couldn\'t load our story right now. Please check your connection and try again.';
+                setError(errorMessage);
                 Alert.alert("Error", "Could not load 'About Us' information.");
             } finally {
                 setIsLoading(false);
@@ -48,28 +53,40 @@ export default function AboutScreen() {
         );
     }
 
+    // Define styles for HTML tags (optional, but good practice for consistency)
+    const renderersProps = {
+        p: {
+            style: localStyles.bodyText // Apply your existing bodyText style to <p> tags
+        }
+    };
+    
+    // Create the source object for the renderer
+    const htmlSource = {
+        html: aboutUsData ? aboutUsData.information : 'Content is currently unavailable.'
+    };
+    
     return (
         <SafeAreaView style={localStyles.container}>
             <ScrollView contentContainerStyle={localStyles.scrollContent}>
                 <View style={localStyles.headerContainer}>
-                    <Text style={localStyles.headerText}>Our Story</Text>
+                    {/* Header component is assumed to be handled by another component/navigation system */}
+                    <Text style={localStyles.headerText}>About Us</Text>
                 </View>
                 
-                {aboutUsData ? (
-                    <Text style={localStyles.bodyText}>
-                        {aboutUsData.information}
-                    </Text>
-                ) : (
-                    <Text style={localStyles.bodyText}>
-                        Content is currently unavailable.
-                    </Text>
-                )}
+                {/* 🔥 Use RenderHtml to display the content */}
+                <RenderHtml
+                    contentWidth={width - 40} // Screen width minus horizontal padding (20 on each side)
+                    source={htmlSource}
+                    tagsStyles={{ p: localStyles.bodyText }} // Apply styles to specific tags
+                />
+
             </ScrollView>
         </SafeAreaView>
     );
 }
 
 const localStyles = StyleSheet.create({
+    // ... (Your existing styles remain here) ...
     container: {
         flex: 1,
         backgroundColor: '#F8F9FA',
@@ -85,12 +102,15 @@ const localStyles = StyleSheet.create({
     },
     headerContainer: {
         marginBottom: 16,
-        borderBottomWidth: 1,
+        // Assuming your 'About Us' title in the image is part of navigation, 
+        // I'll keep the existing styles for the 'Our Story' text for now.
+        // If 'About Us' is the only title, remove the border and adjust margin.
+        borderBottomWidth: 1, 
         borderBottomColor: '#DEE2E6',
         paddingBottom: 16,
     },
     headerText: {
-        fontSize: 38,
+        fontSize: 30, // Adjusted to look more like the screenshot's secondary title
         fontWeight: 'bold',
         color: '#212529',
     },

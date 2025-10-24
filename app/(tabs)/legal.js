@@ -41,7 +41,7 @@ export default function LegalScreen() {
     let isMounted = true;
     const fetchAllNotices = async () => {
       if (!isMounted) return;
-      const API_PATH = '/api/v1/auth/legal-notices/active';
+      const API_PATH = '/api/v1/auth/legal-noticees/active';
       setLoading(true);
       try {
         console.log('Fetching legal notices from:', API_BASE_URL + API_PATH);
